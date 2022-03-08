@@ -1,5 +1,4 @@
 const fs = require('fs').promises;
-const readline = require('readline');
 const { google } = require('googleapis');
 const { SCOPES, TOKEN_PATH } = require('./constant');
 
@@ -24,34 +23,44 @@ const authorize = async () => {
     try {
         tokenData = await fs.readFile(TOKEN_PATH, 'utf8');
     } catch (e) {
-        getAccessToken();
-        return;
+        throw e;
     }
     const token = JSON.parse(tokenData);
-    if (new Date(token.expiry_date).getTime() < new Date().getTime()) return getAccessToken();
+    if (new Date(token.expiry_date).getTime() < new Date().getTime()) throw new Error('ExpiredToken');
     driveClient.auth.setCredentials(token);
+    console.log('Google Client connected');
 };
 
-const getAccessToken = () => {
+const disconnect = async () => {
+    try {
+        await fs.unlink(TOKEN_PATH);
+        console.log('Google Client disconnected');
+    } catch (e) {
+        throw e;
+    }
+};
+
+const getAuthUrl = () => {
     const authUrl = driveClient.auth.generateAuthUrl({
         access_type: 'offline',
         scope: SCOPES,
     });
-    console.log('Authorize this app by visiting this url:', authUrl);
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-    rl.question('Enter the code from that page here: ', (code) => {
-        rl.close();
-        driveClient.auth.getToken(code, (err, token) => {
-            if (err) return console.error('Error retrieving access token', err);
+    return authUrl;
+};
+
+const getAndWriteAccessToken = (code) => {
+    return new Promise((resolve, reject) => {
+        driveClient.auth.getToken(code, async (err, token) => {
+            if (err) reject(err);
             driveClient.auth.setCredentials(token);
             // Store the token to disk for later program executions
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-                if (err) return console.error(err);
-                console.log('Token stored to', TOKEN_PATH);
-            });
+            try {
+                await fs.writeFile(TOKEN_PATH, JSON.stringify(token));
+                console.log(`token store to ${TOKEN_PATH}`);
+            } catch (e) {
+                reject(e);
+            }
+            resolve();
         });
     });
 };
@@ -79,7 +88,9 @@ const listFiles = () => {
 };
 
 module.exports = {
-    getAccessToken,
+    getAndWriteAccessToken,
+    getAuthUrl,
     listFiles,
     authorize,
+    disconnect,
 };
