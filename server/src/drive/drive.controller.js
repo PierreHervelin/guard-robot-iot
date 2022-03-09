@@ -3,7 +3,7 @@ const express = require('express');
 
 const driveRouter = express.Router();
 
-driveRouter.get('/connect', async (req, res) => {
+driveRouter.get('/login', async (req, res) => {
     try {
         await authorize();
         res.status(200).redirect(process.env.REDIRECT_URI);
@@ -11,7 +11,7 @@ driveRouter.get('/connect', async (req, res) => {
         res.redirect(getAuthUrl());
     }
 });
-driveRouter.get('/disconnect', async (req, res) => {
+driveRouter.get('/logout', async (req, res) => {
     try {
         await disconnect();
         res.status(200).redirect(process.env.REDIRECT_URI);
