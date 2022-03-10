@@ -1,5 +1,6 @@
+import Cookies from 'js-cookie';
 import React from 'react';
-import { fetchDriveLogin, fetchDriveLogout, fetchMqttPublish } from '../common/api.services';
+import { fetchDriveLogin, fetchMqttPublish } from '../common/api.services';
 import { RobotActions, Topics } from '../common/constant';
 import { ConfigConsumerHook } from '../store/config.store';
 
@@ -18,7 +19,8 @@ const NavbarComponent = () => {
 
     const onLogin = async () => {
         if (config.login) {
-            await fetchDriveLogout();
+            dispatch({ type: 'logout' });
+            Cookies.remove('token');
         } else {
             await fetchDriveLogin();
         }

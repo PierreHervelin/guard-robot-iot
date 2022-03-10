@@ -1,9 +1,11 @@
 import { createContext, useContext, useReducer } from 'react';
 import { RobotActions } from '../common/constant';
+import Cookies from 'js-cookie';
 
 const initialState = {
     login: false,
     started: false,
+    token: null,
 };
 
 const reducer = (state, action) => {
@@ -12,11 +14,13 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 login: true,
+                token: JSON.parse(Cookies.get('token')),
             };
         case 'logout':
             return {
                 ...state,
                 login: false,
+                token: null,
             };
         case RobotActions.start:
             return {

@@ -8,7 +8,7 @@ driveRouter.get('/login', async (req, res) => {
     if (token) {
         try {
             await authorize(token);
-            res.cookie('token', JSON.stringify(token), { httpOnly: true });
+            res.cookie('token', token.accessToken, { httpOnly: false });
             res.redirect(200, process.env.REDIRECT_URI);
         } catch (e) {
             res.sendStatus(500);
@@ -21,7 +21,7 @@ driveRouter.get('/login', async (req, res) => {
 });
 driveRouter.get('/logout', async (req, res) => {
     try {
-        res.clearCookie('token', { httpOnly: true });
+        res.clearCookie('token', { httpOnly: false });
         res.redirect(200, process.env.REDIRECT_URI);
     } catch (e) {
         res.sendStatus(500);
@@ -32,7 +32,7 @@ driveRouter.get('/token', async (req, res) => {
     const code = req.query.code;
     try {
         const token = await getAccessToken(code);
-        res.cookie('token', JSON.stringify(token), { httpOnly: true });
+        res.cookie('token', JSON.stringify(token), { httpOnly: false });
         res.redirect(200, process.env.REDIRECT_URI);
     } catch (e) {
         res.sendStatus(500);
