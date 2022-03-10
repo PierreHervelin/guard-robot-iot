@@ -6,7 +6,7 @@ const driveClient = {
     auth: null,
 };
 
-const authorize = async () => {
+const getCredentials = async () => {
     let credentialsData;
     try {
         credentialsData = await fs.readFile('credentials.json', 'utf8');
@@ -16,31 +16,26 @@ const authorize = async () => {
     }
     // Authorize a client with credentials, then call the Google Drive API.
     const credentials = JSON.parse(credentialsData);
+
+    return credentials;
+};
+
+const authorize = async (token) => {
+    if (!token) throw new Error('TokenUndefined');
+
+    const credentials = await getCredentials();
     driveClient.auth = new google.auth.OAuth2(credentials.client_id, credentials.client_secret, credentials.redirect_uris[0]);
 
-    let tokenData;
-    // Check if we have previously stored a token.
-    try {
-        tokenData = await fs.readFile(TOKEN_PATH, 'utf8');
-    } catch (e) {
-        throw e;
-    }
-    const token = JSON.parse(tokenData);
     if (new Date(token.expiry_date).getTime() < new Date().getTime()) throw new Error('ExpiredToken');
     driveClient.auth.setCredentials(token);
     console.log('Google Client connected');
 };
 
-const disconnect = async () => {
-    try {
-        await fs.unlink(TOKEN_PATH);
-        console.log('Google Client disconnected');
-    } catch (e) {
-        throw e;
+const getAuthUrl = async () => {
+    if (!driveClient.auth) {
+        const credentials = await getCredentials();
+        driveClient.auth = new google.auth.OAuth2(credentials.client_id, credentials.client_secret, credentials.redirect_uris[0]);
     }
-};
-
-const getAuthUrl = () => {
     const authUrl = driveClient.auth.generateAuthUrl({
         access_type: 'offline',
         scope: SCOPES,
@@ -48,19 +43,12 @@ const getAuthUrl = () => {
     return authUrl;
 };
 
-const getAndWriteAccessToken = (code) => {
+const getAccessToken = (code) => {
     return new Promise((resolve, reject) => {
         driveClient.auth.getToken(code, async (err, token) => {
             if (err) reject(err);
             driveClient.auth.setCredentials(token);
-            // Store the token to disk for later program executions
-            try {
-                await fs.writeFile(TOKEN_PATH, JSON.stringify(token));
-                console.log(`token store to ${TOKEN_PATH}`);
-            } catch (e) {
-                reject(e);
-            }
-            resolve();
+            resolve(token);
         });
     });
 };
@@ -88,9 +76,8 @@ const listFiles = () => {
 };
 
 module.exports = {
-    getAndWriteAccessToken,
+    getAccessToken,
     getAuthUrl,
     listFiles,
     authorize,
-    disconnect,
 };

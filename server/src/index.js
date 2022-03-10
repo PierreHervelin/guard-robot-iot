@@ -1,18 +1,25 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 
 dotenv.config();
+
+const app = express();
+const corsOptions = {
+    origin: true,
+    credentials: true,
+};
+app.use(cors(corsOptions));
 
 // routers
 const mqttRouter = require('./mqtt/mqtt.controller');
 const driveRouter = require('./drive/drive.controller');
 
-//init express
-const app = express();
 const port = 3000;
 
-app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use('/mqtt', mqttRouter);
 app.use('/drive', driveRouter);
 

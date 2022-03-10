@@ -1,5 +1,5 @@
 import React from 'react';
-import { fetchMqttPublish } from '../common/api.services';
+import { fetchDriveLogin, fetchDriveLogout, fetchMqttPublish } from '../common/api.services';
 import { RobotActions, Topics } from '../common/constant';
 import { ConfigConsumerHook } from '../store/config.store';
 
@@ -16,13 +16,23 @@ const NavbarComponent = () => {
         }
     };
 
+    const onLogin = async () => {
+        if (config.login) {
+            await fetchDriveLogout();
+        } else {
+            await fetchDriveLogin();
+        }
+    };
+
     return (
         <div className="navbar">
             <div className="container">
                 <div className="item" onClick={onRobotButtonClick}>
                     {config.started ? 'off' : 'on'}
                 </div>
-                <div className="item">login</div>
+                <div className="item" onClick={onLogin}>
+                    {config.login ? 'logout' : 'login'}
+                </div>
             </div>
         </div>
     );
