@@ -14,7 +14,8 @@ export const fetchDriveLogin = async () => {
     getCookie('token');
     const token = null;
     try {
-        await axios.get(process.env.REACT_APP_API_URI + process.env.REACT_APP_API_URI_DRIVE_LOGIN, { params: { token } });
+        const url = await axios.get(process.env.REACT_APP_API_URI + process.env.REACT_APP_API_URI_DRIVE_LOGIN, { params: { token } });
+        window.location.href = url.data;
     } catch (e) {
         throw e;
     }
