@@ -1,0 +1,106 @@
+.dashboard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    @extend %row;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-top: 60px;
+
+    .mqtt-com {
+        width: 70%;
+        padding-bottom: 20%;
+        margin: 30px;
+        position: relative;
+        overflow-y: scroll;
+
+        h3 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin-bottom: 10px;
+        }
+
+        .logs {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            @extend %col;
+        }
+    }
+
+    .card {
+        width: 20%;
+        padding-bottom: 20%;
+        background-color: rgb(250, 250, 250);
+        border-radius: 25px;
+        margin: 30px;
+        position: relative;
+        transform: scale(1);
+        transition: transform ease 0.5s;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+
+        svg {
+            position: absolute;
+            @extend %mid;
+            font-size: 160px;
+        }
+    }
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    @extend %row;
+    justify-content: flex-end;
+    align-items: center;
+
+    background-color: black;
+
+    h2 {
+        color: white;
+        position: absolute;
+        top: 50%;
+        left: 40px;
+        transform: translate(0, -50%);
+    }
+
+    .container {
+        width: fit-content;
+        height: 50px;
+        @extend %row;
+        justify-content: center;
+        align-items: center;
+
+        .item {
+            padding: 8px;
+            border-radius: 8px;
+            color: white;
+            margin-inline: 10px;
+            text-transform: capitalize;
+
+            transition: all ease 0.5s;
+
+            cursor: pointer;
+
+            &.login-button {
+                background-color: rgb(100, 100, 100);
+            }
+
+            &.start-button {
+                &.on {
+                    background-color: red;
+                }
+                &.off {
+                    background-color: rgb(0, 141, 0);
+                }
+            }
+        }
+    }
+}

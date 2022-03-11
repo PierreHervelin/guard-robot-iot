@@ -28,11 +28,12 @@ const NavbarComponent = () => {
 
     return (
         <div className="navbar">
+            <h2>Guard Robot</h2>
             <div className="container">
-                <div className="item" onClick={onRobotButtonClick}>
+                <div className={`item start-button ${config.started ? 'on' : 'off'}`} onClick={onRobotButtonClick}>
                     {config.started ? 'off' : 'on'}
                 </div>
-                <div className="item" onClick={onLogin}>
+                <div className="item login-button" onClick={onLogin}>
                     {config.login ? 'logout' : 'login'}
                 </div>
             </div>

@@ -3,6 +3,8 @@ import React, { useEffect } from 'react';
 import { checkToken } from '../common/helpers';
 import NavbarComponent from '../components/navbar.component';
 import { ConfigConsumerHook } from '../store/config.store';
+import { ImImages } from 'react-icons/im';
+import MqttLogsComponent from '../components/mqtt-logs.component';
 
 const DashboardPage = () => {
     // eslint-disable-next-line no-unused-vars
@@ -16,9 +18,14 @@ const DashboardPage = () => {
             Cookies.remove('token');
         }
     }, [dispatch]);
+
     return (
-        <div>
+        <div className="dashboard">
             <NavbarComponent />
+            <MqttLogsComponent />
+            <div className="card">
+                <ImImages />
+            </div>
         </div>
     );
 };
