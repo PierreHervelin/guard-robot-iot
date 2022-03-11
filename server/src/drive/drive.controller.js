@@ -1,4 +1,4 @@
-const { authorize, getAuthUrl, getAccessToken, disconnect } = require('./drive.service');
+const { authorize, getAuthUrl, getAccessToken, disconnect, findPicturesOfTheDay } = require('./drive.service');
 const express = require('express');
 
 const driveRouter = express.Router();
@@ -37,6 +37,21 @@ driveRouter.get('/token', async (req, res) => {
     } catch (e) {
         res.sendStatus(500);
         throw e;
+    }
+});
+
+driveRouter.post('/pictures', async (req, res) => {
+    const token = req.body.token;
+    if (token) {
+        try {
+            const files = await findPicturesOfTheDay(token);
+            res.status(200).send(files);
+        } catch (e) {
+            res.sendStatus(500);
+            throw e;
+        }
+    } else {
+        res.sendStatus(403);
     }
 });
 

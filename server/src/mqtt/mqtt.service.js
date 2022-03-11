@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 const publish = async (client, topic, payload) => {
     if (client.connected) {
         try {
@@ -27,7 +29,23 @@ const subscribe = async (client, topic) => {
     }
 };
 
+const getLogs = (startDate, endDate) => {
+    let logs = [];
+    for (const [date, log] of Object.entries(LogsHistory)) {
+        if (Number(date) > Number(startDate) && Number(date) < Number(endDate)) {
+            logs.push(`[${moment(Number(date)).format('LTS')}]: ${log}`);
+        }
+    }
+    return logs;
+};
+
+const LogsHistory = {};
+const MqttTopicsPayloadHistory = {};
+
 module.exports = {
     publish,
     subscribe,
+    getLogs,
+    LogsHistory,
+    MqttTopicsPayloadHistory,
 };

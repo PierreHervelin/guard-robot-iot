@@ -7,10 +7,14 @@ const MqttLogsComponent = () => {
 
     useEffect(() => {
         fetchMqttSubscribe(Topics.alerts);
-        setInterval(async () => {
+        const intervalId = setInterval(async () => {
             const requestLogs = await fetchMqttLogs();
             setLogs(requestLogs);
         }, 1500);
+
+        return () => {
+            clearInterval(intervalId);
+        };
     }, []);
 
     return (

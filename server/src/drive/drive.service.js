@@ -1,6 +1,7 @@
 const fs = require('fs').promises;
 const { google } = require('googleapis');
 const { SCOPES, TOKEN_PATH } = require('./constant');
+const moment = require('moment');
 
 const driveClient = {
     auth: null,
@@ -53,31 +54,49 @@ const getAccessToken = (code) => {
     });
 };
 
-const listFiles = () => {
+const findFolderOfTheDay = async () => {
+    const folderName = `projet-iot${moment().format('YYYY-MM-DD')}`;
+
     const drive = google.drive({ version: 'v3', auth: driveClient.auth });
-    drive.files.list(
-        {
+
+    let result;
+    try {
+        result = await drive.files.list({
+            q: "mimeType='application/vnd.google-apps.folder' and trashed=false",
+            fields: 'nextPageToken, files(id, name)',
+            spaces: 'drive',
+        });
+    } catch (e) {
+        throw e;
+    }
+    const folder = result.data.files.filter((x) => x.name === folderName);
+    return folder.length ? folder[0].id : null;
+};
+
+const findPicturesOfTheDay = async (token) => {
+    if (!driveClient.auth) await authorize(token);
+
+    const drive = google.drive({ version: 'v3', auth: driveClient.auth });
+    const folderId = await findFolderOfTheDay();
+
+    if (!folderId) return;
+
+    let result;
+    try {
+        result = await drive.files.list({
+            q: `mimeType='image/jpeg' and parents in '${folderId}'`,
             pageSize: 10,
             fields: 'nextPageToken, files(id, name)',
-        },
-        (err, res) => {
-            if (err) return console.log('The API returned an error: ' + err);
-            const files = res.data.files;
-            if (files.length) {
-                console.log('Files:');
-                files.map((file) => {
-                    console.log(`${file.name} (${file.id})`);
-                });
-            } else {
-                console.log('No files found.');
-            }
-        },
-    );
+        });
+    } catch (e) {
+        throw e;
+    }
+    return result.data.files.length ? result.data.files : [];
 };
 
 module.exports = {
     getAccessToken,
     getAuthUrl,
-    listFiles,
+    findPicturesOfTheDay,
     authorize,
 };

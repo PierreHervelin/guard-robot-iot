@@ -30,6 +30,24 @@ export const fetchMqttLogs = async () => {
     }
 };
 
+export const fetchMqttPayloads = async (topic) => {
+    try {
+        const request = await axios.get(process.env.REACT_APP_API_URI + process.env.REACT_APP_API_URI_MQTT_PAYLOADS, { params: topic });
+        return request.data;
+    } catch (e) {
+        throw e;
+    }
+};
+
+export const fetchDrivePictures = async (token) => {
+    try {
+        const request = await axios.post(process.env.REACT_APP_API_URI + process.env.REACT_APP_API_URI_DRIVE_FIND_PIC, { token });
+        return request.data;
+    } catch (e) {
+        throw e;
+    }
+};
+
 export const fetchDriveLogin = async () => {
     try {
         const url = await axios.get(process.env.REACT_APP_API_URI + process.env.REACT_APP_API_URI_DRIVE_LOGIN);

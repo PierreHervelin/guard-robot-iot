@@ -1,11 +1,14 @@
 import Cookies from 'js-cookie';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchDriveLogin, fetchMqttPublish } from '../common/api.services';
 import { RobotActions, Topics } from '../common/constant';
 import { ConfigConsumerHook } from '../store/config.store';
 
 const NavbarComponent = () => {
     const [config, dispatch] = ConfigConsumerHook();
+
+    const navigate = useNavigate();
 
     const onRobotButtonClick = async () => {
         if (config.started) {
@@ -28,7 +31,7 @@ const NavbarComponent = () => {
 
     return (
         <div className="navbar">
-            <h2>Guard Robot</h2>
+            <h2 onClick={() => navigate('/')}>Guard Robot</h2>
             <div className="container">
                 <div className={`item start-button ${config.started ? 'on' : 'off'}`} onClick={onRobotButtonClick}>
                     {config.started ? 'off' : 'on'}
